@@ -25,32 +25,66 @@ img{max-width:100%}
 .page{position:relative;z-index:1}
 
 /* ---------- hero: الفيديو ياكل الصفحة، بلا إطار ---------- */
-.hero{position:relative;width:100%;height:min(96vh,900px);min-height:460px;overflow:hidden;background:var(--screen)}
+.hero{position:relative;width:100%;height:min(92vh,880px);min-height:440px;overflow:hidden;
+  background:var(--screen);margin-block-start:64px}
 .hero > img,.hero > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 46%;display:block}
-.hero::before{content:"";position:absolute;inset-inline:0;inset-block-start:0;height:210px;z-index:1;
-  background:linear-gradient(to bottom,rgba(14,10,6,.72),rgba(14,10,6,.34) 46%,transparent);pointer-events:none}
+.hero::before{content:"";position:absolute;inset-inline:0;inset-block-start:0;height:90px;z-index:1;
+  background:linear-gradient(to bottom,rgba(14,10,6,.28),transparent);pointer-events:none}
 .hero::after{content:"";position:absolute;inset-inline:0;inset-block-end:0;height:56px;z-index:1;
   background:linear-gradient(to top,var(--page),rgba(255,255,255,0));pointer-events:none}
 
 /* ---------- nav: تنطي فوق الفيديو ---------- */
-.nav-holder{position:absolute;inset-inline:0;inset-block-start:0;z-index:2}
-.nav{display:flex;align-items:center;gap:28px;padding:20px 0}
-.brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:.06em;
-  background:linear-gradient(172deg,#FFE9B8,var(--gold) 48%,#B57F16);-webkit-background-clip:text;background-clip:text;color:transparent}
-.brand img{width:30px;height:30px;object-fit:contain;display:block}
-.nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;font-size:14.5px;color:#E4DCCF;text-shadow:0 1px 3px rgba(0,0,0,.5)}
-.nav ul li.on{color:#FFFFFF;font-weight:700}
+/* الشريط ثابت فوق دائماً، والفيديو ينزل تحته */
+.nav-holder{position:fixed;inset-inline:0;inset-block-start:0;z-index:50;
+  background:rgba(255,255,255,.86);backdrop-filter:blur(14px) saturate(1.4);
+  border-block-end:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:28px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:900;
+  font-size:21px;letter-spacing:.06em}
+.brand span{background:linear-gradient(172deg,#E5A92B 8%,#8A5D0C);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- اللوغو المتحرك: كل شكل يتنفّس بعكس جاره ---------- */
+.mark{width:32px;height:32px;display:block;flex:none;overflow:visible}
+.mark > *{animation:markFloat 2.8s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.mark__a{animation-delay:0s}
+.mark__b{animation-delay:1.4s}   /* بعكس الأول */
+.mark__c{animation-delay:0s}
+.mark__d{animation-delay:1.4s}
+@keyframes markFloat{
+  0%,100%{transform:translateY(-2.2px)}
+  50%    {transform:translateY(2.2px)}
+}
+.brand:hover .mark > *{animation-duration:1.1s}
+/* الأقسام: أكبر وأخشن */
+.nav ul{display:flex;gap:clamp(18px,2.2vw,30px);list-style:none;margin:0;padding:0;
+  font-family:var(--display);font-size:clamp(15.5px,1.25vw,18px);font-weight:700;color:var(--muted)}
+.nav ul li{cursor:pointer;transition:color .18s}
+.nav ul li:hover{color:var(--gold-ink)}
+.nav ul li.on{color:var(--text);font-weight:800}
 .nav .spacer{flex:1}
 .auth{display:flex;align-items:center;gap:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:10px 19px;
   font-family:var(--display);font-weight:700;font-size:14.5px;border:1px solid transparent;white-space:nowrap;cursor:pointer}
 .btn-gold{background:linear-gradient(180deg,#F7C662,var(--gold));color:#3A2600;box-shadow:0 2px 10px rgba(0,0,0,.3)}
-.nav .btn-plain{color:#EDE6DA;padding-inline:8px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
-.nav .btn-plain:hover{color:#FFFFFF}
+.nav .btn-plain{color:var(--muted);padding-inline:8px}
+.nav .btn-plain:hover{color:var(--text)}
+/* الفاصل يبتلع الفراغ فينزاح الدخول وإنشاء الحساب للزاوية اليسرى */
+.nav .spacer{flex:1}
+
+/* ---------- ألوان العنوان: GENIUS ذهبي مثل اللوغو، و«هذا» بألوان المكعب ---------- */
+.story-h2{font-size:clamp(29px,3.8vw,44px)}
+.tint-gold,.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;padding-block:.06em}
+
+/* الشريط ثابت بارتفاع 64px، فأي قسم ننتقل له لازم يتوقف تحته لا خلفه */
+section[id]{scroll-margin-block-start:80px}
+html{scroll-behavior:smooth}
 
 /* ---------- section bits ---------- */
 .section-head{display:flex;align-items:flex-end;gap:24px;margin-bottom:8px;flex-wrap:wrap}
 .section-head h2{font-size:clamp(27px,3.3vw,38px);font-weight:800}
+.section-head h2.tint-cube{padding-block-end:.12em}
 .section-head p{color:var(--muted);font-size:15px;max-width:52ch}
 
 /* ---------- playground: مكعب تفاعلي ---------- */
@@ -84,27 +118,14 @@ img{max-width:100%}
 .pg-stats b{font-family:var(--mono);font-weight:500;font-size:30px;line-height:1;font-variant-numeric:tabular-nums;color:var(--text)}
 .pg-stats span{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
 
-/* ---------- ألوان العنوان: GENIUS ذهبي مثل اللوغو، و«هذا» بألوان المكعب ---------- */
-.story-h2{font-size:clamp(29px,3.8vw,44px)}
-.tint-gold,.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
-  color:transparent;-webkit-text-fill-color:transparent;padding-block:.06em}
 .tint-gold{background-image:linear-gradient(168deg,#FFDD8E 6%,var(--gold) 44%,#9A6A11 96%)}
 /* ألوان المكعب الأربعة، مشبعة حتى تنقرأ على الأبيض */
 .tint-cube{background-image:linear-gradient(255deg,#2F6FE0 2%,#E14A18 34%,#E8A700 66%,#0F6B55 98%)}
 
-/* ---------- معلومات على جانبي المكعب ---------- */
+/* ---------- إطار المكعب ---------- */
 .pg-frame{position:relative;width:min(94vw,1560px);margin-inline:auto}
-.pg-facts{position:absolute;inset-block:0;width:clamp(196px,16vw,252px);display:flex;flex-direction:column;
-  justify-content:center;gap:18px;z-index:2;pointer-events:none}
-.pg-facts--start{inset-inline-start:0}
-.pg-facts--end{inset-inline-end:0}
-.pgf{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px 17px 15px;
-  box-shadow:0 4px 16px rgba(23,19,16,.07)}
-.pgf__big{display:block;font-family:var(--mono);font-weight:600;font-size:clamp(23px,2.5vw,31px);
-  line-height:1;color:var(--gold-ink);font-variant-numeric:tabular-nums}
-.pgf__unit{display:block;font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:7px;letter-spacing:.04em}
-.pgf--text .pgf__unit{margin-top:0;color:var(--gold-ink);font-weight:600}
-.pgf p{margin-top:9px;font-size:12.5px;line-height:1.8;color:var(--muted)}
+/* العنوان يحاذي حافة المكعب اليمنى بدل ما يطوف بالنص */
+.pg-frame > .section-head{padding-inline:clamp(6px,2vw,34px)}
 
 /* ---------- story: الفيديو + المميزات ---------- */
 .story{padding:70px 0 84px;border-top:1px solid var(--line)}
@@ -128,12 +149,14 @@ img{max-width:100%}
 .feat p{color:var(--muted);font-size:14.5px}
 .feat--soon{background:#FBFAF8}
 
-/* ---------- النقلة: النكتة تصير موقف ---------- */
-.turn{margin-top:34px;padding:30px 0 4px;border-top:1px solid var(--line);max-width:70ch;margin-inline:auto;text-align:center}
-.turn__joke{font-family:var(--display);font-weight:700;font-size:clamp(17px,2.1vw,21px);color:var(--muted)}
-.turn__line{font-family:var(--display);font-weight:800;font-size:clamp(21px,3vw,32px);line-height:1.45;margin-top:12px;color:var(--text)}
-.turn__line strong{font-weight:800;color:var(--gold-ink);white-space:nowrap}
-.turn__cta{margin-top:18px;font-size:15.5px;color:var(--muted)}
+/* ---------- النقلة: سؤال يفتح الشهية، ثم دعوة للأقسام ---------- */
+.turn{margin-top:34px;padding:36px 0 4px;border-top:1px solid var(--line);
+  max-width:70ch;margin-inline:auto;text-align:center}
+/* أكبر من قبل: صارت هي الجملة الوحيدة فوق البطاقات */
+.turn__joke{font-family:var(--display);font-weight:800;line-height:1.4;
+  font-size:clamp(22px,3vw,34px);color:var(--text)}
+.turn__cta{font-family:var(--display);font-weight:700;margin-top:12px;
+  font-size:clamp(15px,1.7vw,19px);color:var(--muted)}
 
 /* ---------- البطاقات تفاعلية فعلاً ---------- */
 .feat{text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
@@ -153,13 +176,9 @@ img{max-width:100%}
 
 a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
 
-/* المعلومات تنزل تحت المكعب لما ما تبقى مساحة على الجوانب */
-@media (max-width:1250px){
-  .pg-facts{position:static;width:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-}
 @media (max-width:900px){
   .story-video{width:100%}
-  .hero{height:min(78vh,620px);min-height:380px}
+  .hero{height:min(78vh,620px);min-height:380px;margin-block-start:56px}
   .hero > img,.hero > video{object-position:56% 42%}
   .nav ul{display:none}
   .btn{padding:9px 15px;font-size:13.5px}
@@ -176,4 +195,146 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
   .brand{font-size:17px;gap:8px}
   .brand img{width:26px;height:26px}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:560px){ .auth .btn-plain{display:none} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}
+  .mark > *{animation:none}}
+
+/* ================= صفحة المنتجات ================= */
+.store{padding-block-start:64px}
+
+/* ---------- لافتة المتجر ---------- */
+/* الصورة كاملة بلا قص: الارتفاع يتبع نسبتها الطبيعية */
+.sbanner{position:relative;width:100%;background:var(--screen);line-height:0}
+.sbanner img{width:100%;height:auto;display:block}
+/* تعتيم من الأسفل حتى ينقرأ العنوان بلا ما نطفئ الصورة */
+/* تحت الصورة على أرضية الصفحة: لا قص ولا حاجة لظل */
+.sbanner__title{font-family:var(--display);font-weight:900;line-height:1.25;
+  font-size:clamp(30px,5vw,62px);margin-block:clamp(30px,5vw,56px) clamp(40px,7vw,80px);
+  text-wrap:balance}
+/* ألوان المكعب: كل كلمة بلون */
+.sbanner__title .c1{color:#FF6A34}
+.sbanner__title .c2{color:#FFC91E}
+.sbanner__title .c3{color:#5AA9FF}
+
+
+/* ---------- مكعب تفاعلي داخل بطاقة منتج ---------- */
+.pcube{display:flex;flex-direction:column;gap:10px}
+.pcube__stage{position:relative;width:100%;aspect-ratio:1;background:transparent}
+.pcube__stage canvas{width:100%;height:100%;display:block;cursor:grab;touch-action:none;outline:none}
+.pcube__stage canvas.grabbing{cursor:grabbing}
+.pcube__stage canvas:focus-visible{outline:2px solid var(--gold-ink);outline-offset:3px}
+.pcube__flag{position:absolute;inset-block-start:8px;inset-inline-start:8px;background:var(--gold);color:#3A2600;
+  font-family:var(--display);font-weight:800;font-size:12px;padding:5px 12px;border-radius:999px}
+.pcube__fallback{position:absolute;inset:0;display:none;place-items:center;padding:20px;text-align:center;
+  color:var(--muted);font-size:13.5px}
+.pcube__stage.failed .pcube__fallback{display:grid}
+.pcube__bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pcube__moves{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pcube__btns{display:flex;gap:8px}
+.pcube__btns button{font-family:var(--display);font-weight:700;font-size:13px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:9px;padding:8px 15px}
+.pcube__btns button:hover:not([disabled]){border-color:var(--gold-ink);color:var(--gold-ink)}
+.pcube__btns button[disabled]{opacity:.45;cursor:default}
+.pcube__btns button:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+
+/* ---------- شبكة المنتجات: مكعب يسار، مواصفات يمين ---------- */
+.store__lede{color:var(--muted);font-size:16px;max-width:60ch;margin-block-end:clamp(30px,5vw,54px)}
+.pgrid{display:flex;flex-direction:column;gap:clamp(28px,4vw,52px);padding-block-end:clamp(50px,8vw,96px)}
+.pitem{display:grid;grid-template-columns:minmax(280px,42%) 1fr;gap:clamp(24px,4vw,56px);align-items:center;
+  padding-block:clamp(24px,3.4vw,40px);border-block-start:1px solid var(--line)}
+/* RTL: العمود الأول يقع يميناً، فنعكس الترتيب ليجلس المكعب يساراً */
+.pitem__play{order:2}
+.pitem__info{order:1}
+.pitem__info h2{font-family:var(--display);font-weight:800;font-size:clamp(21px,2.7vw,30px)}
+.pitem__en{font-family:var(--mono);font-size:12.5px;color:var(--faint);margin-block-start:7px;
+  direction:ltr;text-align:end;unicode-bidi:isolate}
+.pitem__pending{margin-block-start:18px;font-family:var(--mono);font-size:12.5px;color:var(--gold-ink);
+  border:1px dashed var(--line);border-radius:9px;padding:12px 15px}
+.pitem__note{margin-block-start:14px;font-size:13px;line-height:1.85;color:var(--muted);
+  border-inline-start:2px solid var(--line);padding-inline-start:14px;max-width:52ch}
+
+@media (max-width:900px){
+  .pitem{grid-template-columns:1fr;gap:20px}
+  .pitem__play{order:1}
+  .pitem__info{order:2}
+  .pcube__stage{max-width:420px;margin-inline:auto}
+}
+
+/* ---------- مواصفات المنتج ---------- */
+.pitem__lede{margin-block-start:14px;font-size:15.5px;line-height:1.85;color:var(--text);max-width:48ch}
+.pspecs{margin:20px 0 0;display:flex;flex-direction:column;gap:0}
+.pspecs > div{padding-block:13px;border-block-start:1px solid var(--line)}
+.pspecs > div:last-child{border-block-end:1px solid var(--line)}
+.pspecs dt{font-family:var(--display);font-weight:800;font-size:14.5px;color:var(--text)}
+.pspecs dd{margin:5px 0 0;font-size:14px;line-height:1.8;color:var(--muted);max-width:52ch}
+.ptags{display:flex;gap:8px;flex-wrap:wrap;margin-block-start:12px}
+.ptags span{font-family:var(--mono);font-size:11px;color:var(--gold-ink);background:var(--gold-ghost);
+  border:1px solid #F0DDB4;border-radius:999px;padding:4px 11px}
+
+/* ---------- أزرار اللعب تحت المكعب ---------- */
+.pcube__bar{display:flex;gap:8px;justify-content:center}
+.pcube__bar button{font-family:var(--display);font-weight:700;font-size:13px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:9px;padding:8px 16px}
+.pcube__bar button:hover:not([disabled]){border-color:var(--gold-ink);color:var(--gold-ink)}
+.pcube__bar button[disabled]{opacity:.45;cursor:default}
+.pcube__bar button:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+
+/* ---------- عدّاد القطع + زر الإضافة ---------- */
+.atc{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-block-start:16px}
+.atc__qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.atc__qty button{width:38px;height:40px;border:0;background:transparent;cursor:pointer;font-size:17px;
+  font-weight:700;color:var(--text);line-height:1}
+.atc__qty button:hover:not([disabled]){background:var(--gold-ghost);color:var(--gold-ink)}
+.atc__qty button[disabled]{opacity:.35;cursor:default}
+.atc__qty input{width:48px;height:40px;border:0;border-inline:1px solid var(--line);text-align:center;
+  font-family:var(--mono);font-size:14px;color:var(--text);background:transparent;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.atc__qty input::-webkit-outer-spin-button,.atc__qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.atc__qty--sm button{width:30px;height:32px;font-size:15px}
+.atc__qty--sm input{width:38px;height:32px;font-size:13px}
+.atc__add{flex:1;min-width:150px;font-family:var(--display);font-weight:800;font-size:14.5px;cursor:pointer;
+  border:1px solid transparent;border-radius:10px;padding:11px 20px;
+  background:linear-gradient(180deg,#F7C662,var(--gold));color:#3A2600;transition:background .2s}
+.atc__add.done{background:#1FB35A;color:#fff}
+.atc__add:focus-visible,.atc__qty button:focus-visible,.atc__qty input:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+
+/* ---------- زر السلة في الشريط ---------- */
+.cartbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;
+  border:1px solid var(--line);background:var(--card);border-radius:10px;cursor:pointer;color:var(--text);flex:none}
+.cartbtn:hover{border-color:var(--gold-ink);color:var(--gold-ink)}
+.cartbtn:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+.cartbtn__n{position:absolute;inset-block-start:-6px;inset-inline-start:-6px;min-width:19px;height:19px;
+  border-radius:999px;background:var(--gold);color:#3A2600;font-family:var(--mono);font-size:11px;font-weight:600;
+  display:grid;place-items:center;padding-inline:4px}
+
+/* ---------- لوحة السلة ---------- */
+.cart__veil{position:fixed;inset:0;background:rgba(20,14,6,.42);z-index:60;backdrop-filter:blur(2px)}
+.cart{position:fixed;inset-block:0;inset-inline-start:0;width:min(400px,92vw);z-index:61;background:var(--card);
+  border-inline-end:1px solid var(--line);box-shadow:0 0 60px rgba(23,19,16,.22);
+  transform:translateX(-100%);transition:transform .28s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;outline:none}
+.cart.open{transform:none}
+.cart[aria-hidden="true"]{visibility:hidden}
+.cart.open[aria-hidden="false"]{visibility:visible}
+.cart__head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-block-end:1px solid var(--line)}
+.cart__head h2{font-family:var(--display);font-weight:800;font-size:20px}
+.cart__head button{border:0;background:transparent;font-size:17px;cursor:pointer;color:var(--muted);padding:6px 8px}
+.cart__head button:hover{color:var(--text)}
+.cart__empty{padding:34px 20px;color:var(--muted);font-size:14.5px;text-align:center}
+.cart__list{list-style:none;margin:0;padding:8px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px}
+.cart__list li{padding-block:14px;border-block-end:1px solid var(--line)}
+.cart__row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cart__row--sub{margin-block-start:10px}
+.cart__name{font-family:var(--display);font-weight:700;font-size:14.5px}
+.cart__x{border:0;background:transparent;cursor:pointer;color:var(--faint);font-size:13px;padding:4px 6px}
+.cart__x:hover{color:#C0392B}
+.cart__price{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.cart__foot{padding:18px 20px;border-block-start:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.cart__total{display:flex;align-items:baseline;justify-content:space-between;font-family:var(--display);font-weight:800;font-size:16px}
+.cart__total b{color:var(--gold-ink)}
+.cart__go{display:block;text-align:center;font-family:var(--display);font-weight:800;font-size:15px;
+  background:linear-gradient(180deg,#F7C662,var(--gold));color:#3A2600;border-radius:11px;padding:13px 20px}
+.cart__clear{border:1px solid var(--line);background:transparent;border-radius:9px;padding:9px;cursor:pointer;
+  font-family:var(--display);font-size:13px;color:var(--muted)}
+.cart__clear:hover{color:#C0392B;border-color:#E8B4AE}
+.cart__note{font-size:12px;color:var(--faint);line-height:1.7;text-align:center}

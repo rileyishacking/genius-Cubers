@@ -16,7 +16,7 @@ const SECTIONS: Section[] = [
   {
     id: 'store',
     title: 'المتجر',
-    body: 'ستة مكعبات أصلية بمواصفاتها ومستوى الصعوبة، من المبتدئ إلى الاحترافي.',
+    body: 'مكعبات أصلية واحترافية، بمستويات من المبتدئ إلى الاحترافي.',
     href: '/store',
     cta: 'تصفّح المكعبات',
     tint: '#FDF4E2',
@@ -26,9 +26,9 @@ const SECTIONS: Section[] = [
   {
     id: 'arena',
     title: 'الحلبة',
-    body: 'العب بالمكعب الآن، وقريباً لعبتان ولوحتا صدارة باسمك ووقتك.',
+    body: 'العب ويّه محترفين، وخلّي اسمك الأول عليهم.',
     href: '#play',
-    cta: 'العب الآن',
+    cta: 'ادخل الحلبة',
     tint: '#FDEDE6',
     stroke: '#DB4E1B',
     icon: <><circle cx="12" cy="13" r="8" /><path d="M12 9v4l3 2M9 2h6" /></>,
@@ -36,9 +36,9 @@ const SECTIONS: Section[] = [
   {
     id: 'academy',
     title: 'الأكاديمية',
-    body: 'دروس مرتّبة من أول دورة إلى الحل الكامل. المكعب اللي جرّبته فوق هو أول درس.',
+    body: 'دروس من كابتن ولاعب منتخب دولي يعلمك من تحت الصفر إلى المتقدّم.',
     href: '/academy',
-    cta: 'سجّل اهتمامك',
+    cta: 'احجز مقعدك',
     soon: true,
     tint: '#E6F1EC',
     stroke: '#0F6B55',
@@ -100,10 +100,7 @@ export default function Story() {
         {/* النكتة تنقلب لموقف: مو مجرد بائع مكعبات */}
         <div className="turn">
           <p className="turn__joke">شفتوا شلون يتعاركون على مكعب واحد؟</p>
-          <p className="turn__line">
-            هذا المكعب اللي إحنا جايين نبيعه. بس إحنا <strong>مو جايين نبيع شغلة وخلاص</strong> — إحنا جايين اسم وبراند عالمي.
-          </p>
-          <p className="turn__cta">تعالوا خذوا فرّة وياّنا بهذي الأقسام</p>
+          <p className="turn__cta">تعالوا استكشفوا الأقسام وياّنا</p>
         </div>
 
         <div className="feat-grid">

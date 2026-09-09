@@ -265,27 +265,14 @@ export default function CubePlayground() {
 
   return (
     <section className="playground" id="play">
-      <div className="wrap">
+      <div className="pg-frame">
         <div className="section-head">
-          <h2>العب ويه أيهم</h2>
+          <h2 className="tint-cube">العب ويه أيهم</h2>
           <p>اسحب وجهاً لتديره، واسحب الخلفية لتدوير المكعب كله.</p>
         </div>
-
       </div>
 
       <div className="pg-frame">
-        <div className="pg-facts pg-facts--start" aria-hidden="true">
-          <article className="pgf">
-            <b className="pgf__big">43</b>
-            <span className="pgf__unit">كوينتيليون احتمال</span>
-            <p>العدد الدقيق ٤٣٬٢٥٢٬٠٠٣٬٢٧٤٬٤٨٩٬٨٥٦٬٠٠٠. حقيقة رياضية محسوبة، مو تقدير.</p>
-          </article>
-          <article className="pgf">
-            <b className="pgf__big">١٩٧٤</b>
-            <span className="pgf__unit">سنة الاختراع</span>
-            <p>إرنو روبيك، معماري مجري، صنعه ليشرح الأشكال لطلابه. واحتاج شهراً كاملاً ليحلّه بنفسه.</p>
-          </article>
-        </div>
 
         <div className={'pg-stage' + (failed ? ' failed' : '')} id="cubeStage" ref={stageRef}>
           <canvas id="cubeCanvas" ref={canvasRef} tabIndex={0} aria-label="مكعب ثلاثي الأبعاد تفاعلي" />
@@ -294,17 +281,6 @@ export default function CubePlayground() {
           <div className="pg-fallback">متصفحك ما يدعم العرض ثلاثي الأبعاد.<br />المكعب يشتغل على المتصفحات الحديثة.</div>
         </div>
 
-        <div className="pg-facts pg-facts--end" aria-hidden="true">
-          <article className="pgf">
-            <b className="pgf__big">٢٠</b>
-            <span className="pgf__unit">عدد الله</span>
-            <p>أي خلطة مهما كانت معقّدة تُحل بعشرين حركة أو أقل. أُثبتت رياضياً سنة ٢٠١٠.</p>
-          </article>
-          <article className="pgf pgf--text">
-            <span className="pgf__unit">الذاكرة العضلية</span>
-            <p>المحترف ما يفكّر بكل حركة. الخوارزميات تنتقل من التفكير الواعي إلى تنفيذ تلقائي بالأصابع، مثل العزف على آلة.</p>
-          </article>
-        </div>
         </div>
 
       <div className="wrap">
