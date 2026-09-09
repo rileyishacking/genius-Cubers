@@ -274,7 +274,7 @@ export default function Pyraminx({
       canvas.removeEventListener('pointerup', onUp);
       canvas.removeEventListener('pointercancel', onUp);
       canvas.removeEventListener('pointermove', onMove);
-      tiles.forEach(t => { t.mesh.geometry.dispose(); (t.mesh.material as THREE.Material).dispose(); });
+      tiles.forEach(t => { t.mesh.geometry.dispose(); (t.mesh.material as THREE.Material[]).forEach(m => m.dispose()); });
       solid.dispose(); renderer.dispose(); api.current = null;
     };
   }, [colors]);
