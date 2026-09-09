@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="GENIUS">
+  <!-- شبكة متناظرة: خليتان ٢١×٢١ بفاصل ٥، وهامش ٠٫٥ من كل جهة -->
+  <rect x="0.5" y="0.5" width="21" height="21" rx="5.5" fill="#4386E0"/>
+  <circle cx="37" cy="11" r="10.5" fill="#FF5723"/>
+  <polygon points="0.5,26.5 0.5,47.5 20,37" fill="#FFC701"/>
+  <rect x="26.5" y="26.5" width="21" height="21" rx="5.5" fill="#00695C"/>
+</svg>

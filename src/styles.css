@@ -1,0 +1,179 @@
+:root{
+  --page:#FFFFFF; --card:#FFFFFF; --tile:#F4F1EA; --screen:#171310;
+  --line:#E4DFD5; --line-soft:#EFEBE3;
+  --gold:#F0B23C; --gold-ink:#8A5D0C; --gold-ghost:#FDF4E2;
+  --text:#171310; --muted:#665C50; --faint:#8C8275;
+  --blue:#2F6FE0; --orange:#DB4E1B; --green:#0F6B55;
+  --shadow-sm:0 1px 2px rgba(23,19,16,.05), 0 2px 8px rgba(23,19,16,.04);
+  --shadow-lg:0 24px 60px rgba(23,19,16,.16);
+  --display:"Tajawal",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic","Tajawal",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --wrap:1180px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--text);font-family:var(--body);direction:rtl;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0;line-height:1.75}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:28px}
+
+/* المكعبات المتساقطة */
+#fall{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page{position:relative;z-index:1}
+
+/* ---------- hero: الفيديو ياكل الصفحة، بلا إطار ---------- */
+.hero{position:relative;width:100%;height:min(96vh,900px);min-height:460px;overflow:hidden;background:var(--screen)}
+.hero > img,.hero > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 46%;display:block}
+.hero::before{content:"";position:absolute;inset-inline:0;inset-block-start:0;height:210px;z-index:1;
+  background:linear-gradient(to bottom,rgba(14,10,6,.72),rgba(14,10,6,.34) 46%,transparent);pointer-events:none}
+.hero::after{content:"";position:absolute;inset-inline:0;inset-block-end:0;height:56px;z-index:1;
+  background:linear-gradient(to top,var(--page),rgba(255,255,255,0));pointer-events:none}
+
+/* ---------- nav: تنطي فوق الفيديو ---------- */
+.nav-holder{position:absolute;inset-inline:0;inset-block-start:0;z-index:2}
+.nav{display:flex;align-items:center;gap:28px;padding:20px 0}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:.06em;
+  background:linear-gradient(172deg,#FFE9B8,var(--gold) 48%,#B57F16);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand img{width:30px;height:30px;object-fit:contain;display:block}
+.nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;font-size:14.5px;color:#E4DCCF;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.nav ul li.on{color:#FFFFFF;font-weight:700}
+.nav .spacer{flex:1}
+.auth{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:10px 19px;
+  font-family:var(--display);font-weight:700;font-size:14.5px;border:1px solid transparent;white-space:nowrap;cursor:pointer}
+.btn-gold{background:linear-gradient(180deg,#F7C662,var(--gold));color:#3A2600;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.nav .btn-plain{color:#EDE6DA;padding-inline:8px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.nav .btn-plain:hover{color:#FFFFFF}
+
+/* ---------- section bits ---------- */
+.section-head{display:flex;align-items:flex-end;gap:24px;margin-bottom:8px;flex-wrap:wrap}
+.section-head h2{font-size:clamp(27px,3.3vw,38px);font-weight:800}
+.section-head p{color:var(--muted);font-size:15px;max-width:52ch}
+
+/* ---------- playground: مكعب تفاعلي ---------- */
+.playground{padding:66px 0 84px}
+/* بلا صندوق: المكعب يطفو على الصفحة مباشرة */
+.pg-stage{position:relative;width:100%;height:min(88vh,920px);min-height:440px;margin-top:8px}
+#cubeCanvas{width:100%;height:100%;display:block;cursor:grab;touch-action:none;outline:none}
+#cubeCanvas.grabbing{cursor:grabbing}
+#cubeCanvas:focus-visible{outline:2px solid var(--gold-ink);outline-offset:4px}
+.pg-hint{position:absolute;inset-block-end:14px;inset-inline:0;width:max-content;margin:0 auto;padding:5px 13px;border-radius:999px;
+  background:rgba(255,255,255,.84);backdrop-filter:blur(4px);font-family:var(--mono);font-size:11.5px;color:var(--muted);
+  pointer-events:none;transition:opacity .35s}
+.pg-hint.gone{opacity:0}
+.pg-flag{position:absolute;inset-block-start:15px;inset-inline-start:15px;background:var(--gold);color:#3A2600;
+  font-family:var(--display);font-weight:800;font-size:13px;padding:7px 14px;border-radius:999px;opacity:0;
+  transform:translateY(-6px);transition:opacity .35s,transform .35s;pointer-events:none}
+.pg-flag.on{opacity:1;transform:none}
+.pg-fallback{position:absolute;inset:0;display:none;place-items:center;padding:30px;text-align:center;color:var(--muted);font-size:14px;line-height:1.8}
+.pg-stage.failed .pg-fallback{display:grid}
+.pg-under{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap;margin-top:22px}
+.pg-controls{display:flex;gap:10px;flex-wrap:wrap}
+.pg-btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 20px;font-family:var(--display);font-weight:700;
+  font-size:14.5px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.pg-btn:hover{border-color:var(--gold-ink);color:var(--gold-ink)}
+.pg-btn--gold{background:linear-gradient(180deg,#F7C662,var(--gold));border-color:transparent;color:#3A2600}
+.pg-btn--gold:hover{color:#3A2600}
+.pg-btn[disabled]{opacity:.45;cursor:default}
+.pg-btn:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+.pg-stats{display:flex;gap:clamp(26px,4vw,48px)}
+.pg-stats div{display:flex;flex-direction:column;gap:5px}
+.pg-stats b{font-family:var(--mono);font-weight:500;font-size:30px;line-height:1;font-variant-numeric:tabular-nums;color:var(--text)}
+.pg-stats span{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+
+/* ---------- ألوان العنوان: GENIUS ذهبي مثل اللوغو، و«هذا» بألوان المكعب ---------- */
+.story-h2{font-size:clamp(29px,3.8vw,44px)}
+.tint-gold,.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;padding-block:.06em}
+.tint-gold{background-image:linear-gradient(168deg,#FFDD8E 6%,var(--gold) 44%,#9A6A11 96%)}
+/* ألوان المكعب الأربعة، مشبعة حتى تنقرأ على الأبيض */
+.tint-cube{background-image:linear-gradient(255deg,#2F6FE0 2%,#E14A18 34%,#E8A700 66%,#0F6B55 98%)}
+
+/* ---------- معلومات على جانبي المكعب ---------- */
+.pg-frame{position:relative;width:min(94vw,1560px);margin-inline:auto}
+.pg-facts{position:absolute;inset-block:0;width:clamp(196px,16vw,252px);display:flex;flex-direction:column;
+  justify-content:center;gap:18px;z-index:2;pointer-events:none}
+.pg-facts--start{inset-inline-start:0}
+.pg-facts--end{inset-inline-end:0}
+.pgf{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px 17px 15px;
+  box-shadow:0 4px 16px rgba(23,19,16,.07)}
+.pgf__big{display:block;font-family:var(--mono);font-weight:600;font-size:clamp(23px,2.5vw,31px);
+  line-height:1;color:var(--gold-ink);font-variant-numeric:tabular-nums}
+.pgf__unit{display:block;font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:7px;letter-spacing:.04em}
+.pgf--text .pgf__unit{margin-top:0;color:var(--gold-ink);font-weight:600}
+.pgf p{margin-top:9px;font-size:12.5px;line-height:1.8;color:var(--muted)}
+
+/* ---------- story: الفيديو + المميزات ---------- */
+.story{padding:70px 0 84px;border-top:1px solid var(--line)}
+.story-stage{margin-top:30px}
+.story-video{position:relative;width:min(94vw,1560px);margin-inline:auto;border-radius:20px;overflow:hidden;
+  background:#000;aspect-ratio:16/9;box-shadow:var(--shadow-lg)}
+.story-video video{width:100%;height:100%;display:block;object-fit:cover}
+.story-play{position:absolute;inset:0;width:100%;height:100%;border:0;cursor:pointer;
+  background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,.05) 55%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;
+  font-family:var(--display);font-weight:800;font-size:15px}
+.story-play svg{width:78px;height:78px;padding:22px;border-radius:50%;background:var(--gold);color:#3A2600;box-shadow:0 12px 34px rgba(0,0,0,.35);transition:transform .2s}
+.story-play:hover svg{transform:scale(1.06)}
+.story-play:focus-visible{outline:3px solid var(--gold);outline-offset:-6px}
+.story-video.playing .story-play{display:none}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+.feat{position:relative;border:1px solid var(--line);border-radius:16px;padding:26px 24px 24px;background:var(--card);
+  display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-sm)}
+.feat__ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;margin-bottom:4px}
+.feat h3{font-size:20px;font-weight:800}
+.feat p{color:var(--muted);font-size:14.5px}
+.feat--soon{background:#FBFAF8}
+
+/* ---------- النقلة: النكتة تصير موقف ---------- */
+.turn{margin-top:34px;padding:30px 0 4px;border-top:1px solid var(--line);max-width:70ch;margin-inline:auto;text-align:center}
+.turn__joke{font-family:var(--display);font-weight:700;font-size:clamp(17px,2.1vw,21px);color:var(--muted)}
+.turn__line{font-family:var(--display);font-weight:800;font-size:clamp(21px,3vw,32px);line-height:1.45;margin-top:12px;color:var(--text)}
+.turn__line strong{font-weight:800;color:var(--gold-ink);white-space:nowrap}
+.turn__cta{margin-top:18px;font-size:15.5px;color:var(--muted)}
+
+/* ---------- البطاقات تفاعلية فعلاً ---------- */
+.feat{text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.feat:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 12px 30px rgba(23,19,16,.10)}
+.feat:active{transform:translateY(-1px)}
+.feat:focus-visible{outline:2px solid var(--gold-ink);outline-offset:3px}
+.feat__go{margin-top:auto;padding-top:14px;display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--display);font-weight:700;font-size:14px;color:var(--gold-ink)}
+.feat__go svg{transition:transform .18s ease}
+.feat:hover .feat__go svg{transform:translateX(-4px)}
+
+.feat__chip{position:absolute;inset-block-start:18px;inset-inline-end:18px;font-size:11px;font-weight:700;color:#3A2600;
+  background:var(--gold);border-radius:999px;padding:4px 10px}
+
+/* ---------- footer ---------- */
+.foot{border-top:1px solid var(--line);padding:30px 0 48px;color:var(--faint);font-size:13px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px}
+
+/* المعلومات تنزل تحت المكعب لما ما تبقى مساحة على الجوانب */
+@media (max-width:1250px){
+  .pg-facts{position:static;width:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+}
+@media (max-width:900px){
+  .story-video{width:100%}
+  .hero{height:min(78vh,620px);min-height:380px}
+  .hero > img,.hero > video{object-position:56% 42%}
+  .nav ul{display:none}
+  .btn{padding:9px 15px;font-size:13.5px}
+  /* على الموبايل المكعب محدود بالعرض، فالمساحة مربّعة حتى ما يبقى فراغ فوقه وتحته */
+  .pg-stage{height:auto;aspect-ratio:1/1;min-height:0}
+  .pg-hint{display:none}
+  .pg-under{justify-content:center}
+  .feat-grid{grid-template-columns:1fr}
+  .story-video{border-radius:14px}
+}
+@media (max-width:480px){
+  .nav{gap:12px;padding:14px 0}
+  .btn{padding:8px 12px;font-size:13px;border-radius:9px}
+  .brand{font-size:17px;gap:8px}
+  .brand img{width:26px;height:26px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
