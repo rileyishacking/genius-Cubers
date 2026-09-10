@@ -24,6 +24,7 @@ type Ctx = {
   closeAuth: () => void;
   signUp: (name: string, email: string, pass: string) => Promise<Res>;
   signIn: (email: string, pass: string) => Promise<Res>;
+  signInWithGoogle: () => Promise<Res>;
   signOut: () => void;
 };
 
@@ -42,17 +43,28 @@ const arabize = (m: string): string => {
   return 'صار خطأ. جرّب مرة ثانية.';
 };
 
+/* بيانات المزوّد يحرّرها المستخدم، فتصلح للعرض لا للصلاحيات */
+const providerName = (u: { user_metadata?: Record<string, unknown> }): string | undefined => {
+  const m = u.user_metadata ?? {};
+  const v = m.full_name ?? m.name;
+  return typeof v === 'string' ? v : undefined;
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [ask, setAsk] = useState<'login' | 'signup' | null>(null);
 
-  /* الاسم من profiles، وإن غاب الصف نرجع لبريد الحساب */
-  const hydrate = useCallback(async (id: string, email: string, created: string) => {
-    let name = email.split('@')[0];
+  /* الاسم من profiles. وإن غاب الصف نُنشئه: حسابات Google تصل
+     بلا ملف، وبدونه لا يظهر اللاعب في لوحة الصدارة.
+     الاسم المقترح من بيانات المزوّد للعرض فقط، ولا يُبنى عليه
+     أي قرار صلاحيات. */
+  const hydrate = useCallback(async (id: string, email: string, created: string, suggested?: string) => {
+    let name = suggested?.trim() || email.split('@')[0];
     if (supabase) {
       const { data } = await supabase.from('profiles').select('name').eq('id', id).maybeSingle();
       if (data?.name) name = data.name;
+      else await supabase.from('profiles').upsert({ id, name });
     }
     setUser({ id, name, email, since: created });
   }, []);
@@ -62,14 +74,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user;
-      if (u) void hydrate(u.id, u.email ?? '', u.created_at ?? new Date().toISOString());
+      if (u) void hydrate(u.id, u.email ?? '', u.created_at ?? new Date().toISOString(), providerName(u));
       setReady(true);
     });
 
     /* الجلسة تتغيّر من تبويب آخر أو عند انتهاء الرمز، فنتابعها */
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user;
-      if (u) void hydrate(u.id, u.email ?? '', u.created_at ?? new Date().toISOString());
+      if (u) void hydrate(u.id, u.email ?? '', u.created_at ?? new Date().toISOString(), providerName(u));
       else setUser(null);
     });
     return () => sub.subscription.unsubscribe();
@@ -107,6 +119,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { ok: true };
   }, [hydrate]);
 
+  const signInWithGoogle = useCallback(async (): Promise<Res> => {
+    if (!supabase) return { ok: false, message: 'الحسابات غير مهيّأة على هذه النسخة.' };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/arena` },
+    });
+    if (error) {
+      const t = error.message.toLowerCase();
+      if (t.includes('not enabled') || t.includes('provider')) {
+        return { ok: false, message: 'الدخول بـ Google مو مفعّل بعد.' };
+      }
+      return { ok: false, message: arabize(error.message) };
+    }
+    /* المتصفح ينتقل إلى Google، والجلسة تُلتقط عند العودة */
+    return { ok: true };
+  }, []);
+
   const signOut = useCallback(() => {
     void supabase?.auth.signOut();
     setUser(null);
@@ -116,8 +145,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user, ready, ask,
     openAuth: m => setAsk(m),
     closeAuth: () => setAsk(null),
-    signUp, signIn, signOut,
-  }), [user, ready, ask, signUp, signIn, signOut]);
+    signUp, signIn, signInWithGoogle, signOut,
+  }), [user, ready, ask, signUp, signIn, signInWithGoogle, signOut]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

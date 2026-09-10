@@ -16,7 +16,7 @@ import { useAuth } from '../auth/AuthContext';
 type Mode = 'login' | 'signup';
 
 export default function Account() {
-  const { user, signIn, signUp, signOut } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, signOut } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
 
@@ -148,7 +148,13 @@ export default function Account() {
 
         <p className="acct__or"><span>أو</span></p>
 
-        <button type="button" className="acct__google" disabled title="يحتاج ربط الخادم">
+        <button type="button" className="acct__google" disabled={busy}
+                onClick={async () => {
+                  setErr(''); setBusy(true);
+                  const r = await signInWithGoogle();
+                  if (!r.ok) { setBusy(false); setErr(r.message); }
+                  /* عند النجاح المتصفح ينتقل إلى Google، فلا نُطفئ busy */
+                }}>
           <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M21.6 12.2c0-.7-.06-1.4-.18-2H12v3.8h5.4a4.6 4.6 0 01-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/>
             <path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0012 22z"/>
@@ -156,7 +162,6 @@ export default function Account() {
             <path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 003.1 7.4L6.4 10c.8-2.3 3-4 5.6-4z"/>
           </svg>
           المتابعة بحساب Google
-          <em>قريباً</em>
         </button>
 
         <p className="acct__swap">
