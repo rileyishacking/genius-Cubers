@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import CartButton from '../cart/CartButton';
+import { useAuth } from '../auth/AuthContext';
 
 function Mark() {
   return (
@@ -13,6 +14,8 @@ function Mark() {
 }
 
 export default function Nav() {
+  const { user, openAuth, signOut } = useAuth();
+
   return (
       <div className="nav-holder">
         <div className="wrap">
@@ -24,14 +27,23 @@ export default function Nav() {
             <ul>
               <li><NavLink to="/" className={({isActive})=>isActive?'on':''} end>الرئيسية</NavLink></li>
               <li><NavLink to="/store" className={({isActive})=>isActive?'on':''}>المنتجات</NavLink></li>
-              <li><a href="/#play">الحلبة</a></li>
+              <li><NavLink to="/arena" className={({isActive})=>isActive?'on':''}>الحلبة</NavLink></li>
               <li><a href="/#story">الأكاديمية</a></li>
             </ul>
             <span className="spacer" />
             <div className="auth">
               <CartButton />
-              <a className="btn btn-plain" href="#">تسجيل الدخول</a>
-              <a className="btn btn-gold" href="#">إنشاء حساب</a>
+              {user ? (
+                <>
+                  <span className="nav-user" title={user.email}>{user.name}</span>
+                  <button className="btn btn-plain" type="button" onClick={signOut}>خروج</button>
+                </>
+              ) : (
+                <>
+                  <button className="btn btn-plain" type="button" onClick={() => openAuth('login')}>تسجيل الدخول</button>
+                  <button className="btn btn-gold" type="button" onClick={() => openAuth('signup')}>إنشاء حساب</button>
+                </>
+              )}
             </div>
           </nav>
         </div>

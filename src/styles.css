@@ -352,3 +352,56 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 @media (max-width:860px){
   .feat-grid--two{grid-template-columns:1fr}
 }
+
+/* ---------- الحلبة ---------- */
+.arena{padding-block-start:96px}
+.arena .playground{padding-block-start:8px}
+.nav-user{font-family:var(--display);font-weight:700;font-size:13px;color:var(--gold-ink);
+  max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* نتيجة آخر محاولة */
+.arena-result{margin-block:26px 8px;padding:22px 24px;border:1px solid var(--line);border-radius:16px;
+  background:var(--card);box-shadow:var(--shadow-sm);text-align:center}
+.arena-result--saved{border-color:var(--gold);background:var(--gold-ghost)}
+.arena-result__time{font-family:var(--mono);font-weight:700;font-size:clamp(34px,7vw,54px);
+  line-height:1;color:var(--text);letter-spacing:-.02em}
+.arena-result__meta{font-family:var(--display);font-weight:700;font-size:13px;color:var(--muted);margin-top:8px}
+.arena-result__note{font-size:13px;color:var(--muted);margin-top:12px}
+.arena-link{background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:var(--gold-ink);font-weight:700;text-decoration:underline}
+.arena-warn{margin-block:18px;padding:12px 16px;border:1px solid #E8D9A8;border-radius:11px;
+  background:var(--gold-ghost);font-size:13px;color:var(--gold-ink)}
+
+/* البطاقات */
+.arena-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-block:26px 64px;align-items:start}
+.arena-grid:has(> :only-child){grid-template-columns:minmax(0,560px);justify-content:center}
+.arena-card{border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--card);
+  box-shadow:var(--shadow-sm)}
+.arena-card h3{font-size:19px;margin-bottom:14px}
+.arena-empty{font-size:14px;color:var(--muted);line-height:1.8}
+.arena-note{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);
+  font-size:12px;color:var(--faint);line-height:1.7}
+
+.arena-best{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding-bottom:14px;margin-bottom:12px;border-bottom:1px solid var(--line-soft)}
+.arena-best span{font-family:var(--display);font-weight:700;font-size:13px;color:var(--muted)}
+.arena-best b{font-family:var(--mono);font-size:26px;color:var(--gold-ink)}
+
+.arena-mine,.arena-top{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.arena-mine li,.arena-top li{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:9px;font-size:14px}
+.arena-mine li:nth-child(odd),.arena-top li:nth-child(odd){background:var(--tile)}
+.arena-mine b,.arena-top b{font-family:var(--mono);font-size:15px}
+.arena-mine span{font-size:12px;color:var(--muted)}
+.arena-when{margin-inline-start:auto}
+
+.arena-top .arena-rank{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--line-soft);font-family:var(--display);font-weight:800;font-size:12px;color:var(--muted);flex:none}
+.arena-top li:nth-child(1) .arena-rank{background:var(--gold);color:#3A2600}
+.arena-top .arena-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:var(--display);font-weight:700}
+.arena-top li.me{outline:1.5px solid var(--gold);outline-offset:-1.5px}
+
+@media (max-width:860px){
+  .arena-grid{grid-template-columns:1fr}
+  .arena-grid:has(> :only-child){grid-template-columns:1fr}
+}

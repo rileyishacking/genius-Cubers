@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './auth/AuthContext';
+import AuthModal from './auth/AuthModal';
 import { CartProvider } from './cart/CartContext';
 import CartPanel from './cart/CartPanel';
 import FallingCubes from './components/FallingCubes';
@@ -8,6 +10,7 @@ import CubePlayground from './components/CubePlayground';
 import Story from './components/Story';
 import Footer from './components/Footer';
 import Store from './pages/Store';
+import Arena from './pages/Arena';
 
 function Home() {
   return (
@@ -22,6 +25,7 @@ function Home() {
 export default function App() {
   return (
     <BrowserRouter>
+      <AuthProvider>
       <CartProvider>
       <FallingCubes />
       <div className="page">
@@ -29,12 +33,15 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/store" element={<Store />} />
+          <Route path="/arena" element={<Arena />} />
           <Route path="*" element={<Home />} />
         </Routes>
         <Footer />
         <CartPanel />
+        <AuthModal />
       </div>
       </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

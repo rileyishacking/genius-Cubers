@@ -14,7 +14,15 @@ const LOCAL = [
 ];
 type Axis = 'x' | 'y' | 'z';
 
-export default function CubePlayground() {
+export type SolveResult = { ms: number; moves: number };
+type Props = {
+  /** يُنادى مرة واحدة عند اكتمال الحل. الحلبة تستعمله لتسجيل الوقت. */
+  onSolve?: (r: SolveResult) => void;
+  /** الحلبة تكتب عنوانها بنفسها، فتخفي العنوان الداخلي */
+  bare?: boolean;
+};
+
+export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const api = useRef<{ scramble: () => void; reset: () => void } | null>(null);
@@ -26,6 +34,11 @@ export default function CubePlayground() {
   const [failed, setFailed] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const timer = useRef<{ id: number | null; t0: number }>({ id: null, t0: 0 });
+
+  /* refresh() تعيش داخل useEffect بمصفوفة اعتماديات فارغة، فلو استُعمل
+     onSolve مباشرة لتجمّد على أول قيمة. نحتفظ به في ref يُحدَّث كل render. */
+  const solveCb = useRef(onSolve);
+  solveCb.current = onSolve;
 
   /* المؤقّت يبدأ بأول حركة من اللاعب، لا عند الخلط: الخلط مو جزء من محاولته */
   const startTimer = () => {
@@ -92,7 +105,7 @@ export default function CubePlayground() {
     const ro = new ResizeObserver(resize); ro.observe(stage);
 
     /* ---------- حالة الحل ---------- */
-    let scrambled = false, animating = false, moveCount = 0;
+    let scrambled = false, animating = false, moveCount = 0, reported = false;
     const stickerFacing = (c: THREE.Mesh, dir: THREE.Vector3) => {
       for (let i = 0; i < 6; i++) { const v = LOCAL[i].clone().applyQuaternion(c.quaternion); if (v.dot(dir) > 0.9) return (c.userData.colors as number[])[i]; }
       return null;
@@ -113,8 +126,19 @@ export default function CubePlayground() {
     };
     const refresh = () => {
       const n = solvedFaces();
-      setFaces(n); setSolved(n === 6 && scrambled);
-      if (n === 6 && scrambled) stopTimer();
+      const done = n === 6 && scrambled;
+      setFaces(n); setSolved(done);
+      if (!done) return;
+
+      if (reported) return;          /* refresh تُستدعى بعد كل دورة: نُبلّغ مرة واحدة */
+      reported = true;
+
+      /* الزمن يُقرأ من الساعة مباشرة، لا من حالة elapsed: تلك تتحدّث
+         كل ١٠٠ms فقد تتأخر حتى عُشر ثانية، وهذا فرق يقرّر مركزاً. */
+      const ms = timer.current.t0 ? performance.now() - timer.current.t0 : 0;
+      stopTimer();
+      setElapsed(ms);                /* نُظهر الزمن الدقيق نفسه المسجَّل */
+      if (ms > 0) solveCb.current?.({ ms, moves: moveCount });
     };
 
     /* ---------- تدوير طبقة ---------- */
@@ -201,10 +225,12 @@ export default function CubePlayground() {
       const axis: Axis = Math.abs(r.x) ? 'x' : Math.abs(r.y) ? 'y' : 'z';
       const sign = r[axis] > 0 ? 1 : -1;
       const layer = Math.round(hitCubie.position[axis] / GAP);
-      if (turn(axis, layer, sign, 190)) {
-        moveCount++; scrambled = true; setMoves(moveCount); setHintGone(true);
-        if (moveCount === 1) startTimer();
-      }
+      /* الحساب قبل الدوران لا بعده: حين يكون التبويب مخفياً تنفّذ turn()
+         نهايتها فوراً وبشكل متزامن، فتصل refresh() إلى onSolve قبل أن
+         يزيد العدّاد، فيُسجَّل الحل بحركة ناقصة. */
+      moveCount++; scrambled = true; setMoves(moveCount); setHintGone(true);
+      if (moveCount === 1) startTimer();
+      turn(axis, layer, sign, 190);
     };
     const onKey = (e: KeyboardEvent) => {
       const s = 0.16;
@@ -221,7 +247,7 @@ export default function CubePlayground() {
     api.current = {
       scramble: () => {
         if (animating) return;
-        setBusy(true); moveCount = 0; scrambled = true; setMoves(0); setSolved(false); setHintGone(true); resetTimer();
+        setBusy(true); moveCount = 0; scrambled = true; reported = false; setMoves(0); setSolved(false); setHintGone(true); resetTimer();
         const next = (i: number) => {
           if (i >= 22) { setBusy(false); return; }
           turn(AX[(Math.random() * 3) | 0], ((Math.random() * 3) | 0) - 1, Math.random() < 0.5 ? 1 : -1, 95, () => next(i + 1));
@@ -234,7 +260,7 @@ export default function CubePlayground() {
         for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
           const c = cubies[i++]; c.position.set(x * GAP, y * GAP, z * GAP); c.quaternion.identity();
         }
-        moveCount = 0; scrambled = false; setMoves(0); resetTimer(); refresh();
+        moveCount = 0; scrambled = false; reported = false; setMoves(0); resetTimer(); refresh();
       },
     };
 
@@ -266,10 +292,12 @@ export default function CubePlayground() {
   return (
     <section className="playground" id="play">
       <div className="pg-frame">
-        <div className="section-head">
-          <h2 className="tint-cube">العب ويه أيهم</h2>
-          <p>اسحب وجهاً لتديره، واسحب الخلفية لتدوير المكعب كله.</p>
-        </div>
+        {!bare && (
+          <div className="section-head">
+            <h2 className="tint-cube">العب ويه أيهم</h2>
+            <p>اسحب وجهاً لتديره، واسحب الخلفية لتدوير المكعب كله.</p>
+          </div>
+        )}
       </div>
 
       <div className="pg-frame">
