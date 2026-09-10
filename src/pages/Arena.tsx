@@ -59,9 +59,9 @@ export default function Arena() {
   return (
     <main className="arena">
       <div className="wrap">
-        <div className="section-head">
-          <h2 className="tint-cube">الحلبة</h2>
-          <p>اخلط المكعب وحلّه بأسرع وقت. المؤقّت يبدأ بأول حركة منك، لا عند الخلط.</p>
+        <div className="section-head arena-head">
+          <h2 className="tint-gold">الحلبة</h2>
+          <p className="tint-cube">اخلط المكعب وحلّه بأسرع وقت. المؤقّت يبدأ بأول حركة منك، لا عند الخلط.</p>
         </div>
       </div>
 
