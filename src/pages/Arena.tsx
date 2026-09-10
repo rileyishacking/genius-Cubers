@@ -60,11 +60,11 @@ export default function Arena() {
   return (
     <main className="arena">
       <div className="wrap">
-        <div className="section-head arena-head">
-          <h2 className="tint-gold">الحلبة</h2>
-          <CourseCallout />
-          <p className="tint-cube">اخلط المكعب وحلّه بأسرع وقت. المؤقّت يبدأ بأول حركة منك، لا عند الخلط.</p>
-        </div>
+        {/* خارج .section-head عمداً: قواعدها العامة على p تسرّبت
+            إلى بطاقة النداء وتغلّبت على أنماطها. */}
+        <h2 className="arena-title tint-gold">الحلبة</h2>
+        <CourseCallout />
+        <p className="arena-lede tint-cube">اخلط المكعب وحلّه بأسرع وقت. المؤقّت يبدأ بأول حركة منك، لا عند الخلط.</p>
       </div>
 
       <CubePlayground onSolve={onSolve} bare />

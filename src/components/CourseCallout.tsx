@@ -18,8 +18,7 @@ export default function CourseCallout() {
       </p>
 
       <p className="callout__body">
-        عاجبك تحل المكعب بكل سهولة؟ سوّينالك <b>كورس أساسيات مجاني</b> من تحت
-        الصفر، يعلّمك خطوة خطوة شلون تصير محترف بحل المكعبات.
+        عاجبك تحل المكعب بكل سهولة؟ سوّينالك <b>كورس أساسيات مجاني</b> من تحت الصفر.
       </p>
 
       <a className="callout__cta" href={COURSE_HREF}>
