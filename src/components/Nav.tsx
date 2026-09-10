@@ -14,7 +14,7 @@ function Mark() {
 }
 
 export default function Nav() {
-  const { user, openAuth, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
       <div className="nav-holder">
@@ -40,8 +40,8 @@ export default function Nav() {
                 </>
               ) : (
                 <>
-                  <button className="btn btn-plain" type="button" onClick={() => openAuth('login')}>تسجيل الدخول</button>
-                  <button className="btn btn-gold" type="button" onClick={() => openAuth('signup')}>إنشاء حساب</button>
+                  <Link className="btn btn-plain" to="/account?mode=login">تسجيل الدخول</Link>
+                  <Link className="btn btn-gold" to="/account?mode=signup">إنشاء حساب</Link>
                 </>
               )}
             </div>
