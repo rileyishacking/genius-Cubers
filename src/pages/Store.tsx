@@ -1,6 +1,7 @@
 import PuzzleCube, { type Scheme, STANDARD } from '../components/PuzzleCube';
 import Pyraminx from '../components/Pyraminx';
 import AddToCart from '../cart/AddToCart';
+import ChooseHelp from '../components/ChooseHelp';
 
 type Item = {
   id: string;
@@ -169,6 +170,8 @@ export default function Store() {
             </article>
           ))}
         </div>
+
+        <ChooseHelp />
       </div>
     </main>
   );
