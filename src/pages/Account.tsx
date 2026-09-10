@@ -16,7 +16,7 @@ import { useAuth } from '../auth/AuthContext';
 type Mode = 'login' | 'signup';
 
 export default function Account() {
-  const { user, signIn, signOut } = useAuth();
+  const { user, signIn, signUp, signOut } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
 
@@ -29,20 +29,29 @@ export default function Account() {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const isNew = mode === 'signup';
 
   useEffect(() => { setErr(''); }, [mode]);
   const swap = () => nav(`/account?mode=${isNew ? 'login' : 'signup'}`);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const n = name.trim(), m = email.trim();
     if (isNew && n.length < 2) return setErr('اكتب اسمك.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) return setErr('البريد غير صحيح.');
     if (pass.length < 8) return setErr('كلمة المرور لازم تكون ٨ أحرف على الأقل.');
-    /* pass لا يُمرَّر ولا يُخزَّن: لا يوجد خادم يتحقق منه بعد */
-    signIn(isNew ? n : (n || m.split('@')[0]), m);
+
+    setErr(''); setBusy(true);
+    const res = isNew ? await signUp(n, m, pass) : await signIn(m, pass);
+    setBusy(false);
+    if (!res.ok) return setErr(res.message);
+
+    /* إن كان تأكيد البريد مفعّلاً فلا جلسة بعد التسجيل: نطلب
+       من الزائر يفتح بريده بدل ما نوديه لصفحة ما راح تعرفه. */
+    if (isNew && res.needsConfirm) { setSent(true); return; }
     nav('/arena');
   };
 
@@ -54,6 +63,23 @@ export default function Account() {
           <p className="acct__sub">حسابك شغّال. أوقاتك تنحفظ بلوحة الصدارة.</p>
           <Link className="acct__go" to="/arena">روح للحلبة</Link>
           <button type="button" className="acct__ghost" onClick={signOut}>تسجيل الخروج</button>
+        </div>
+      </main>
+    );
+  }
+
+  if (sent) {
+    return (
+      <main className="acct">
+        <div className="acct__card acct__card--done">
+          <h1>افحص بريدك</h1>
+          <p className="acct__sub">
+            دزّينالك رسالة تأكيد على <b dir="ltr">{email.trim()}</b>. افتحها واضغط
+            الرابط، وبعدها ارجع وسجّل دخولك.
+          </p>
+          <button type="button" className="acct__ghost" onClick={() => { setSent(false); swap(); }}>
+            روح لتسجيل الدخول
+          </button>
         </div>
       </main>
     );
@@ -115,8 +141,8 @@ export default function Account() {
 
           {err && <p className="acct__err" role="alert">{err}</p>}
 
-          <button type="submit" className="acct__go">
-            {isNew ? 'أنشئ الحساب' : 'تسجيل الدخول'}
+          <button type="submit" className="acct__go" disabled={busy}>
+            {busy ? 'لحظة…' : isNew ? 'أنشئ الحساب' : 'تسجيل الدخول'}
           </button>
         </form>
 

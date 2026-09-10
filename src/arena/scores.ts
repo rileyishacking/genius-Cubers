@@ -1,18 +1,19 @@
 /* =========================================================
-   تخزين أزمنة الحل.
+   تخزين أزمنة الحل: الواجهة، والتنفيذ المحلي القديم.
 
-   ملاحظة مهمة: هذه نسخة محلية مؤقتة — الأوقات محفوظة في متصفح
-   الزائر فقط، فكل واحد يشوف لوحته هو. لوحة صدارة مشتركة حقيقية
-   تحتاج ربط Supabase، وعندها نكتب تنفيذاً ثانياً لنفس الواجهة
-   ونبدّل السطر الأخير في هذا الملف وحده. الصفحة لا تتغيّر.
-
-   نفس نمط src/auth/AuthContext.tsx.
+   الأوقات صارت في Supabase (supabaseStore.ts) ولوحة الصدارة
+   مشتركة بين كل اللاعبين. التنفيذ المحلي باقٍ هنا احتياطاً حين
+   لا تتوفّر إعدادات Supabase، فيبقى الموقع يشتغل بدل أن ينهار.
    ========================================================= */
+
+import { supabaseStore } from './supabaseStore';
 
 export type Solve = {
   id: string;
   name: string;
-  email: string;
+  /* مُعرّف اللاعب الثابت: user_id في Supabase. لا يُستعمل البريد
+     مفتاحاً لأنه قد يتغيّر، ولأن اللوحة تعرضه لكل الزوار. */
+  userKey: string;
   ms: number;
   moves: number;
   at: string;
@@ -21,7 +22,7 @@ export type Solve = {
 export interface ScoreStore {
   submit(s: Omit<Solve, 'id'>): Promise<Solve>;
   topTimes(limit: number): Promise<Solve[]>;
-  myTimes(email: string, limit: number): Promise<Solve[]>;
+  myTimes(userKey: string, limit: number): Promise<Solve[]>;
   /** هل التخزين متاح فعلاً؟ الصفحة تنبّه الزائر إذا لا */
   available(): boolean;
 }
@@ -72,15 +73,15 @@ export const localStore: ScoreStore = {
     /* أفضل وقت مفرد لكل لاعب، حتى لا يحتل شخص واحد اللوحة كلها */
     const best = new Map<string, Solve>();
     for (const r of read()) {
-      const cur = best.get(r.email);
-      if (!cur || r.ms < cur.ms) best.set(r.email, r);
+      const cur = best.get(r.userKey);
+      if (!cur || r.ms < cur.ms) best.set(r.userKey, r);
     }
     return [...best.values()].sort((a, b) => a.ms - b.ms).slice(0, limit);
   },
 
-  async myTimes(email, limit) {
+  async myTimes(userKey, limit) {
     return read()
-      .filter(r => r.email === email)
+      .filter(r => r.userKey === userKey)
       .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
       .slice(0, limit);
   },
@@ -95,5 +96,5 @@ export const localStore: ScoreStore = {
   },
 };
 
-/* ← السطر الوحيد الذي يتغيّر عند الانتقال إلى Supabase */
-export const store: ScoreStore = localStore;
+/* Supabase حين تتوفّر إعداداته، وإلا التخزين المحلي */
+export const store: ScoreStore = supabaseStore.available() ? supabaseStore : localStore;

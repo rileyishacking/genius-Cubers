@@ -28,14 +28,14 @@ export default function Arena() {
 
   const load = useCallback(async () => {
     setTop(await store.topTimes(TOP));
-    setMine(user ? await store.myTimes(user.email, MINE) : []);
+    setMine(user ? await store.myTimes(user.id, MINE) : []);
   }, [user]);
 
   useEffect(() => { void load(); }, [load]);
 
   const record = useCallback(async (r: SolveResult) => {
     if (!user) return false;
-    await store.submit({ name: user.name, email: user.email, ms: r.ms, moves: r.moves, at: new Date().toISOString() });
+    await store.submit({ name: user.name, userKey: user.id, ms: r.ms, moves: r.moves, at: new Date().toISOString() });
     await load();
     return true;
   }, [user, load]);
@@ -77,7 +77,7 @@ export default function Arena() {
             <p className="arena-result__meta">{last.moves} حركة</p>
             {user ? (
               <p className="arena-result__note">
-                {saved ? 'انحفظ وقتك بلوحة الصدارة.' : 'ما قدرنا نحفظ الوقت. تخزين المتصفح مقفل.'}
+                {saved ? 'انحفظ وقتك بلوحة الصدارة.' : 'ما قدرنا نحفظ الوقت. تأكد من اتصالك وجرّب مرة ثانية.'}
               </p>
             ) : (
               <p className="arena-result__note">
@@ -92,7 +92,7 @@ export default function Arena() {
 
         {!canSave && (
           <p className="arena-warn">
-            تخزين المتصفح مقفل عندك، فالأوقات ما راح تنحفظ. تكدر تلعب عادي.
+الحسابات مو مهيّأة على هذه النسخة، فالأوقات ما راح تنحفظ. تكدر تلعب عادي.
           </p>
         )}
 
@@ -129,7 +129,7 @@ export default function Arena() {
             {top.length ? (
               <ol className="arena-top">
                 {top.map((s, i) => (
-                  <li key={s.id} className={user && s.email === user.email ? 'me' : ''}>
+                  <li key={s.id} className={user && s.userKey === user.id ? 'me' : ''}>
                     <span className="arena-rank">{i + 1}</span>
                     <span className="arena-name">{s.name}</span>
                     <b>{clockCs(s.ms)}</b>
@@ -142,7 +142,7 @@ export default function Arena() {
               </p>
             )}
             <p className="arena-note">
-              الأوقات محفوظة بمتصفحك حالياً. لمّا نربط الحسابات راح تصير اللوحة مشتركة بين كل اللاعبين.
+              اللوحة مشتركة بين كل اللاعبين، وتعرض أفضل وقت لكل واحد.
             </p>
           </section>
         </div>

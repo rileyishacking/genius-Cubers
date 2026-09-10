@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
 
-/* نافذة تسجيل الدخول / إنشاء الحساب */
+/* نافذة سريعة داخل الصفحة. وجودها إلى جانب /account مقصود:
+   اللاعب الذي حلّ توّه ولم يسجّل بعد يخسر وقته لو نقلناه لصفحة
+   أخرى، فنسأله هنا ويبقى مكانه. */
 export default function AuthModal() {
-  const { ask, closeAuth, signIn, openAuth } = useAuth();
+  const { ask, closeAuth, signIn, signUp, openAuth } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ask) return;
-    setErr('');
+    setErr(''); setSent(false);
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeAuth(); };
     document.addEventListener('keydown', onKey);
     box.current?.querySelector('input')?.focus();
@@ -21,12 +26,19 @@ export default function AuthModal() {
   if (!ask) return null;
   const isNew = ask === 'signup';
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const n = name.trim(), m = email.trim();
     if (isNew && n.length < 2) return setErr('اكتب اسمك.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) return setErr('البريد غير صحيح.');
-    signIn(isNew ? n : (n || m.split('@')[0]), m);
+    if (pass.length < 8) return setErr('كلمة المرور لازم تكون ٨ أحرف على الأقل.');
+
+    setErr(''); setBusy(true);
+    const res = isNew ? await signUp(n, m, pass) : await signIn(m, pass);
+    setBusy(false);
+    if (!res.ok) return setErr(res.message);
+    if (isNew && res.needsConfirm) setSent(true);
+    /* عند النجاح مع جلسة، AuthContext يغلق النافذة بنفسه */
   };
 
   return (
@@ -35,39 +47,53 @@ export default function AuthModal() {
       <div className="amodal__box" ref={box}>
         <button type="button" className="amodal__x" onClick={closeAuth} aria-label="إغلاق">✕</button>
 
-        <h2>{isNew ? 'إنشاء حساب' : 'تسجيل الدخول'}</h2>
-        <p className="amodal__sub">
-          {isNew ? 'دقيقة واحدة، وتفتح لك الحلبة كاملة.' : 'أهلاً بعودتك — دخولك يحفظ أوقاتك وترتيبك.'}
-        </p>
+        {sent ? (
+          <>
+            <h2>افحص بريدك</h2>
+            <p className="amodal__sub">
+              دزّينالك رسالة تأكيد على <b dir="ltr">{email.trim()}</b>. افتحها واضغط الرابط،
+              وبعدها ارجع وسجّل دخولك.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2>{isNew ? 'إنشاء حساب' : 'تسجيل الدخول'}</h2>
+            <p className="amodal__sub">
+              {isNew ? 'دقيقة وحدة، وينحفظ وقتك بلوحة الصدارة.' : 'أهلاً بعودتك — دخولك يحفظ أوقاتك وترتيبك.'}
+            </p>
 
-        <form onSubmit={submit}>
-          {isNew && (
-            <label>
-              <span>الاسم</span>
-              <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" placeholder="أيهم" />
-            </label>
-          )}
-          <label>
-            <span>البريد الإلكتروني</span>
-            <input value={email} onChange={e => setEmail(e.target.value)} type="email" inputMode="email"
-                   autoComplete="email" dir="ltr" placeholder="you@example.com" />
-          </label>
+            <form onSubmit={submit} noValidate>
+              {isNew && (
+                <label>
+                  <span>الاسم</span>
+                  <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" placeholder="أيهم" />
+                </label>
+              )}
+              <label>
+                <span>البريد الإلكتروني</span>
+                <input value={email} onChange={e => setEmail(e.target.value)} type="email" inputMode="email"
+                       autoComplete="email" dir="ltr" placeholder="you@example.com" />
+              </label>
+              <label>
+                <span>كلمة المرور</span>
+                <input value={pass} onChange={e => setPass(e.target.value)} type="password" dir="ltr"
+                       autoComplete={isNew ? 'new-password' : 'current-password'} />
+              </label>
 
-          {err && <p className="amodal__err">{err}</p>}
-          <button type="submit" className="btn btn-gold amodal__go">{isNew ? 'أنشئ الحساب وادخل' : 'دخول'}</button>
-        </form>
+              {err && <p className="amodal__err" role="alert">{err}</p>}
+              <button type="submit" className="btn btn-gold amodal__go" disabled={busy}>
+                {busy ? 'لحظة…' : isNew ? 'أنشئ الحساب وادخل' : 'دخول'}
+              </button>
+            </form>
 
-        <p className="amodal__swap">
-          {isNew ? 'عندك حساب؟ ' : 'ما عندك حساب؟ '}
-          <button type="button" onClick={() => openAuth(isNew ? 'login' : 'signup')}>
-            {isNew ? 'سجّل الدخول' : 'أنشئ واحداً'}
-          </button>
-        </p>
-
-        <p className="amodal__note">
-          نسخة تجريبية: الحساب محفوظ على جهازك فقط بلا كلمة سر. الحسابات الكاملة
-          ولوحة الصدارة المشتركة تُفعَّل عند ربط قاعدة البيانات.
-        </p>
+            <p className="amodal__swap">
+              {isNew ? 'عندك حساب؟ ' : 'ما عندك حساب؟ '}
+              <button type="button" onClick={() => openAuth(isNew ? 'login' : 'signup')}>
+                {isNew ? 'سجّل الدخول' : 'أنشئ واحداً'}
+              </button>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
