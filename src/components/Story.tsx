@@ -39,7 +39,6 @@ const SECTIONS: Section[] = [
     body: 'دروس من كابتن ولاعب منتخب دولي يعلمك من تحت الصفر إلى المتقدّم.',
     href: '/academy',
     cta: 'احجز مقعدك',
-    soon: true,
     tint: '#E6F1EC',
     stroke: '#0F6B55',
     icon: <><path d="M3 7l9-4 9 4-9 4z" /><path d="M7 10v5c0 1.7 2.2 3 5 3s5-1.3 5-3v-5" /></>,

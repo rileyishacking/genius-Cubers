@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import Store from './pages/Store';
 import Arena from './pages/Arena';
 import Account from './pages/Account';
+import Academy from './pages/Academy';
 
 function Home() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/store" element={<Store />} />
           <Route path="/arena" element={<Arena />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/academy" element={<Academy />} />
           <Route path="*" element={<Home />} />
         </Routes>
         <Footer />

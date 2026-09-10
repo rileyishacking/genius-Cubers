@@ -28,7 +28,7 @@ export default function Nav() {
               <li><NavLink to="/" className={({isActive})=>isActive?'on':''} end>الرئيسية</NavLink></li>
               <li><NavLink to="/store" className={({isActive})=>isActive?'on':''}>المنتجات</NavLink></li>
               <li><NavLink to="/arena" className={({isActive})=>isActive?'on':''}>الحلبة</NavLink></li>
-              <li><a href="/#story">الأكاديمية</a></li>
+              <li><NavLink to="/academy" className={({isActive})=>isActive?'on':''}>الأكاديمية</NavLink></li>
             </ul>
             <span className="spacer" />
             <div className="auth">
