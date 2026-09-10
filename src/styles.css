@@ -357,8 +357,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 .arena{padding-block-start:96px}
 /* مساحة محجوزة فوق العنوان (نحو ٤ أسطر) لمحتوى قادم: مقطع تحفيزي أو غيره.
    قيمة واحدة تتحكّم بالفراغ، فتعديلها لاحقاً سطر واحد. */
-.arena{--arena-top:160px}
-.arena-head{margin-block-start:var(--arena-top)}
+.arena{--arena-gap:160px}
+/* العنوان يبقى في الأعلى، والفراغ تحته يدفع النص والمكعب للأسفل */
+.arena-head p{margin-block-start:var(--arena-gap)}
 .arena .playground{padding-block-start:8px}
 .nav-user{font-family:var(--display);font-weight:700;font-size:13px;color:var(--gold-ink);
   max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -412,10 +413,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 
 /* عنوان الحلبة أكبر: العنوان ذهبي والسطر تحته بألوان المكعبات */
 .arena-head{display:block;margin-bottom:18px}
-.arena-head h2{display:block;width:fit-content;font-size:clamp(42px,7vw,78px);
-  line-height:1.05;font-weight:800}
+.arena-head h2{display:block;width:fit-content;margin-inline:auto;text-align:center;
+  font-size:clamp(42px,7vw,78px);line-height:1.05;font-weight:800}
 .arena-head p{max-width:34ch;font-family:var(--display);font-weight:700;
-  font-size:clamp(19px,2.5vw,27px);line-height:1.5;margin-top:10px}
+  font-size:clamp(19px,2.5vw,27px);line-height:1.5}
 /* التدرّج يُقصّ على النص، فيحتاج لوناً شفافاً وعرضاً محدوداً ليبان تنوّع الألوان */
 .arena-head p.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
   color:transparent;background-image:linear-gradient(255deg,#2F6FE0 2%,#E14A18 34%,#E8A700 66%,#0F6B55 98%)}
