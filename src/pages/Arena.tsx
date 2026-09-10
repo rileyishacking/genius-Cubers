@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import CubePlayground, { type SolveResult } from '../components/CubePlayground';
+import CourseCallout from '../components/CourseCallout';
 import { useAuth } from '../auth/AuthContext';
 import { store, type Solve } from '../arena/scores';
 import { clockCs, shortDate } from '../arena/format';
@@ -61,6 +62,7 @@ export default function Arena() {
       <div className="wrap">
         <div className="section-head arena-head">
           <h2 className="tint-gold">الحلبة</h2>
+          <CourseCallout />
           <p className="tint-cube">اخلط المكعب وحلّه بأسرع وقت. المؤقّت يبدأ بأول حركة منك، لا عند الخلط.</p>
         </div>
       </div>

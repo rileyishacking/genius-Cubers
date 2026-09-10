@@ -357,8 +357,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 .arena{padding-block-start:96px}
 /* مساحة محجوزة فوق العنوان (نحو ٤ أسطر) لمحتوى قادم: مقطع تحفيزي أو غيره.
    قيمة واحدة تتحكّم بالفراغ، فتعديلها لاحقاً سطر واحد. */
-.arena{--arena-gap:160px}
-/* العنوان يبقى في الأعلى، والفراغ تحته يدفع النص والمكعب للأسفل */
+.arena{--arena-gap:38px}
+/* العنوان في الأعلى، ثم نداء الكورس، ثم سطر الوصف */
 .arena-head p{margin-block-start:var(--arena-gap)}
 .arena .playground{padding-block-start:8px}
 .nav-user{font-family:var(--display);font-weight:700;font-size:13px;color:var(--gold-ink);
@@ -425,3 +425,27 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 /* التدرّج يُقصّ على النص، فيحتاج لوناً شفافاً وعرضاً محدوداً ليبان تنوّع الألوان */
 .arena-head p.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
   color:transparent;background-image:linear-gradient(255deg,#2F6FE0 2%,#E14A18 34%,#E8A700 66%,#0F6B55 98%)}
+
+/* ---------- نداء الكورس المجاني (الحلبة) ---------- */
+.callout{position:relative;max-width:640px;margin:30px auto 0;padding:26px 28px 24px;
+  border:1px solid #E8D9A8;border-radius:18px;background:var(--gold-ghost);
+  box-shadow:0 10px 30px rgba(23,19,16,.07);text-align:center}
+.callout__badge{position:absolute;inset-block-start:-11px;inset-inline-start:50%;
+  transform:translateX(50%);background:var(--gold);color:#3A2600;border-radius:999px;
+  padding:4px 14px;font-family:var(--display);font-weight:800;font-size:12px}
+.callout__stop{font-family:var(--display);font-weight:800;color:var(--orange);
+  font-size:clamp(22px,3.2vw,31px);line-height:1.25}
+.callout__body{margin-top:10px;font-size:clamp(14px,1.7vw,16px);line-height:1.85;color:var(--text)}
+.callout__body b{color:var(--gold-ink)}
+.callout__cta{display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  background:linear-gradient(180deg,#F7C662,var(--gold));color:#3A2600;
+  border-radius:11px;padding:12px 24px;font-family:var(--display);font-weight:800;font-size:15px;
+  box-shadow:0 4px 14px rgba(138,93,12,.22);transition:transform .18s ease,box-shadow .18s ease}
+.callout__cta:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(138,93,12,.3)}
+.callout__cta svg{transition:transform .18s ease}
+.callout__cta:hover svg{transform:translateX(-4px)}
+@media (prefers-reduced-motion:reduce){
+  .callout__cta,.callout__cta svg{transition:none}
+  .callout__cta:hover{transform:none}
+  .callout__cta:hover svg{transform:none}
+}
