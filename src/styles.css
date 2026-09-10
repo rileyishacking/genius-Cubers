@@ -415,8 +415,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 .arena-head{display:block;margin-bottom:18px}
 .arena-head h2{display:block;width:fit-content;margin-inline:auto;text-align:center;
   font-size:clamp(42px,7vw,78px);line-height:1.05;font-weight:800}
-.arena-head p{max-width:34ch;font-family:var(--display);font-weight:700;
-  font-size:clamp(19px,2.5vw,27px);line-height:1.5}
+.arena-head p{max-width:none;text-align:center;text-wrap:nowrap;
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(15px,2vw,25px);line-height:1.5}
+/* على الشاشات الضيقة السطر الواحد يفيض، فنسمح له بالالتفاف هناك */
+@media (max-width:760px){
+  .arena-head p{text-wrap:balance;max-width:34ch;margin-inline:auto}
+}
 /* التدرّج يُقصّ على النص، فيحتاج لوناً شفافاً وعرضاً محدوداً ليبان تنوّع الألوان */
 .arena-head p.tint-cube{display:inline-block;-webkit-background-clip:text;background-clip:text;
   color:transparent;background-image:linear-gradient(255deg,#2F6FE0 2%,#E14A18 34%,#E8A700 66%,#0F6B55 98%)}
