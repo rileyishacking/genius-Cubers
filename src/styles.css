@@ -449,3 +449,32 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
   .callout__cta:hover{transform:none}
   .callout__cta:hover svg{transform:none}
 }
+
+/* ---------- القسم التعريفي (الرئيسية) ---------- */
+.intro{padding-block:76px 22px;text-align:center}
+.intro__eyebrow{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.12em;
+  color:var(--gold-ink);text-transform:uppercase;margin-bottom:14px}
+.intro__title{font-size:clamp(30px,5vw,54px);line-height:1.18;font-weight:800}
+.intro__lede{max-width:62ch;margin:20px auto 0;font-size:clamp(16px,1.9vw,20px);
+  line-height:1.95;color:var(--muted);text-wrap:balance}
+.intro__turn{margin-top:38px;font-family:var(--display);font-weight:700;
+  font-size:clamp(17px,2.1vw,23px);color:var(--text)}
+.intro__turn b{color:var(--gold-ink)}
+
+.intro__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;text-align:start}
+.ibox{border:1px solid var(--line);border-radius:16px;padding:26px 24px 24px;background:var(--card);
+  box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:9px;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.ibox:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 12px 30px rgba(23,19,16,.10)}
+.ibox__ico{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;margin-bottom:4px}
+.ibox h3{font-size:18px}
+.ibox p{font-size:14.5px;line-height:1.8;color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){
+  .ibox{transition:none}
+  .ibox:hover{transform:none}
+}
+@media (max-width:860px){
+  .intro{padding-block:52px 16px}
+  .intro__grid{grid-template-columns:1fr}
+}

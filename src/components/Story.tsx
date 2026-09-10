@@ -27,7 +27,7 @@ const SECTIONS: Section[] = [
     id: 'arena',
     title: 'الحلبة',
     body: 'العب ويّه محترفين، وخلّي اسمك الأول عليهم.',
-    href: '#play',
+    href: '/arena',
     cta: 'ادخل الحلبة',
     tint: '#FDEDE6',
     stroke: '#DB4E1B',

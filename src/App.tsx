@@ -6,7 +6,7 @@ import CartPanel from './cart/CartPanel';
 import FallingCubes from './components/FallingCubes';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import CubePlayground from './components/CubePlayground';
+import Intro from './components/Intro';
 import Story from './components/Story';
 import Footer from './components/Footer';
 import Store from './pages/Store';
@@ -16,7 +16,7 @@ function Home() {
   return (
     <>
       <Hero />
-      <CubePlayground />
+      <Intro />
       <Story />
     </>
   );
