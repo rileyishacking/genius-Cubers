@@ -49,7 +49,9 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
   const stopTimer = () => {
     if (timer.current.id !== null) { clearInterval(timer.current.id); timer.current.id = null; }
   };
-  const resetTimer = () => { stopTimer(); setElapsed(0); };
+  /* t0 يُصفَّر مع كل إعادة: لو بقي من المحاولة السابقة، ومرّت الخلطة
+     العشوائية بحالة محلولة لحظياً، كان يُسجَّل حل وهمي بزمن قديم. */
+  const resetTimer = () => { stopTimer(); timer.current.t0 = 0; setElapsed(0); };
   const clock = (ms: number) => {
     const t = Math.floor(ms / 1000);
     return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
@@ -105,7 +107,7 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
     const ro = new ResizeObserver(resize); ro.observe(stage);
 
     /* ---------- حالة الحل ---------- */
-    let scrambled = false, animating = false, moveCount = 0, reported = false;
+    let scrambled = false, appScrambled = false, animating = false, moveCount = 0, reported = false;
     const stickerFacing = (c: THREE.Mesh, dir: THREE.Vector3) => {
       for (let i = 0; i < 6; i++) { const v = LOCAL[i].clone().applyQuaternion(c.quaternion); if (v.dot(dir) > 0.9) return (c.userData.colors as number[])[i]; }
       return null;
@@ -131,6 +133,9 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
       if (!done) return;
 
       if (reported) return;          /* refresh تُستدعى بعد كل دورة: نُبلّغ مرة واحدة */
+      /* المؤقّت لا يعمل إلا بعد أول حركة من اللاعب، فأي «حل» قبله
+         (أثناء الخلط مثلاً) ليس محاولة ولا يُحسب ولا يستهلك البلاغ. */
+      if (timer.current.id === null) return;
       reported = true;
 
       /* الزمن يُقرأ من الساعة مباشرة، لا من حالة elapsed: تلك تتحدّث
@@ -138,7 +143,9 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
       const ms = timer.current.t0 ? performance.now() - timer.current.t0 : 0;
       stopTimer();
       setElapsed(ms);                /* نُظهر الزمن الدقيق نفسه المسجَّل */
-      if (ms > 0) solveCb.current?.({ ms, moves: moveCount });
+      /* يُبلَّغ الحل فقط إذا بدأ من خلطة التطبيق: تحريك مكعب محلول
+         حركتين ثم عكسهما كان يُحسب «حلاً» بثانيتين ويتصدّر اللوحة. */
+      if (ms > 0 && appScrambled) solveCb.current?.({ ms, moves: moveCount });
     };
 
     /* ---------- تدوير طبقة ---------- */
@@ -247,7 +254,7 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
     api.current = {
       scramble: () => {
         if (animating) return;
-        setBusy(true); moveCount = 0; scrambled = true; reported = false; setMoves(0); setSolved(false); setHintGone(true); resetTimer();
+        setBusy(true); moveCount = 0; scrambled = true; appScrambled = true; reported = false; setMoves(0); setSolved(false); setHintGone(true); resetTimer();
         const next = (i: number) => {
           if (i >= 22) { setBusy(false); return; }
           turn(AX[(Math.random() * 3) | 0], ((Math.random() * 3) | 0) - 1, Math.random() < 0.5 ? 1 : -1, 95, () => next(i + 1));
@@ -260,7 +267,7 @@ export default function CubePlayground({ onSolve, bare = false }: Props = {}) {
         for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
           const c = cubies[i++]; c.position.set(x * GAP, y * GAP, z * GAP); c.quaternion.identity();
         }
-        moveCount = 0; scrambled = false; reported = false; setMoves(0); resetTimer(); refresh();
+        moveCount = 0; scrambled = false; appScrambled = false; reported = false; setMoves(0); resetTimer(); refresh();
       },
     };
 

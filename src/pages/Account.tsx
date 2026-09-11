@@ -9,8 +9,9 @@ import { useAuth } from '../auth/AuthContext';
    يؤدّيان الوظيفة نفسها، فيتردّد الزائر بينهما. صار لكل وضع
    رابطه، والتبديل من مكان واحد أسفل النموذج.
 
-   كلمة المرور تُطلب وتُتحقّق لكنها لا تُخزَّن ولا تُرسل: لا خادم
-   يتحقق منها بعد.
+   كلمة المرور تُرسل إلى Supabase Auth عبر HTTPS وتُخزَّن هناك مجزّأة،
+   ولا تمرّ بأي تخزين محلي. الجلسة تبقى محفوظة تلقائياً، لذلك لا
+   توجد خانة «تذكرني».
    ========================================================= */
 
 type Mode = 'login' | 'signup';
@@ -27,7 +28,6 @@ export default function Account() {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [show, setShow] = useState(false);
-  const [remember, setRemember] = useState(true);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -131,11 +131,7 @@ export default function Account() {
 
           {!isNew && (
             <div className="acct__row">
-              <label className="acct__rem">
-                <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />
-                <span>تذكرني</span>
-              </label>
-              <span className="acct__soon" title="يحتاج ربط الخادم">نسيت كلمة المرور؟ قريباً</span>
+              <span className="acct__soon">نسيت كلمة المرور؟ قريباً</span>
             </div>
           )}
 
