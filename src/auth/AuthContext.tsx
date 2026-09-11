@@ -4,10 +4,9 @@ import { supabase } from '../lib/supabase';
 /* =========================================================
    حساب المستخدم — عبر Supabase Auth.
 
-   كلمة المرور حقيقية الآن: تُرسل إلى Supabase وتُخزَّن مجزّأة
-   هناك، ولا تمر بأي تخزين محلي. الاسم المعروض يعيش في جدول
-   profiles لأن بيانات auth غير مقروءة للعامة، ولوحة الصدارة
-   تحتاج تعرض أسماء اللاعبين.
+   كلمة المرور حقيقية: تُرسل إلى Supabase وتُخزَّن مجزّأة هناك، ولا
+   تمر بأي تخزين محلي. الاسم المعروض يعيش في جدول profiles لأن
+   بيانات auth غير مقروءة للعامة، ولوحة الصدارة تحتاج أسماء اللاعبين.
    ========================================================= */
 export type User = { id: string; name: string; email: string; since: string };
 
@@ -19,12 +18,16 @@ type Res = { ok: true; needsConfirm?: boolean } | { ok: false; message: string }
 type Ctx = {
   user: User | null;
   ready: boolean;
+  /** الزائر وصل من رابط «نسيت كلمة المرور» ويحتاج يضع كلمة جديدة */
+  recovery: boolean;
   ask: 'login' | 'signup' | null;
   openAuth: (m: 'login' | 'signup') => void;
   closeAuth: () => void;
   signUp: (name: string, email: string, pass: string) => Promise<Res>;
   signIn: (email: string, pass: string) => Promise<Res>;
   signInWithGoogle: () => Promise<Res>;
+  sendReset: (email: string) => Promise<Res>;
+  setNewPassword: (pass: string) => Promise<Res>;
   signOut: () => void;
 };
 
@@ -35,10 +38,13 @@ const arabize = (m: string): string => {
   const t = m.toLowerCase();
   if (t.includes('invalid login credentials')) return 'البريد أو كلمة المرور غلط.';
   if (t.includes('already registered') || t.includes('already been registered')) return 'هذا البريد عنده حساب. سجّل دخولك.';
-  if (t.includes('password should be')) return 'كلمة المرور قصيرة. لازم ٨ أحرف على الأقل.';
+  if (t.includes('should be different')) return 'كلمة المرور الجديدة لازم تختلف عن القديمة.';
+  if (t.includes('password should be') || t.includes('at least')) return 'كلمة المرور قصيرة. لازم ٨ أحرف على الأقل.';
+  if (t.includes('weak')) return 'كلمة المرور ضعيفة. اختار وحدة أقوى.';
   if (t.includes('unable to validate email') || t.includes('invalid email')) return 'البريد غير صحيح.';
   if (t.includes('email not confirmed')) return 'لازم تأكّد بريدك أول. شوف رسالة التأكيد.';
-  if (t.includes('rate limit') || t.includes('too many')) return 'محاولات كثيرة. انتظر شوية وجرّب مرة ثانية.';
+  if (t.includes('expired') || t.includes('invalid or has expired')) return 'الرابط انتهت صلاحيته. اطلب رابط جديد.';
+  if (t.includes('rate limit') || t.includes('too many') || t.includes('security purposes')) return 'محاولات كثيرة. انتظر شوية وجرّب مرة ثانية.';
   if (t.includes('failed to fetch') || t.includes('network')) return 'ما وصلنا للخادم. تأكد من اتصالك بالإنترنت.';
   return 'صار خطأ. جرّب مرة ثانية.';
 };
@@ -53,6 +59,7 @@ const providerName = (u: { user_metadata?: Record<string, unknown> }): string | 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [recovery, setRecovery] = useState(false);
   const [ask, setAsk] = useState<'login' | 'signup' | null>(null);
 
   /* الاسم من profiles. وإن غاب الصف نُنشئه: حسابات Google تصل
@@ -78,8 +85,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setReady(true);
     });
 
-    /* الجلسة تتغيّر من تبويب آخر أو عند انتهاء الرمز، فنتابعها */
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    /* الجلسة تتغيّر من تبويب آخر أو عند انتهاء الرمز، فنتابعها.
+       PASSWORD_RECOVERY يعني الزائر فتح رابط إعادة التعيين من بريده. */
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') setRecovery(true);
       const u = session?.user;
       if (u) void hydrate(u.id, u.email ?? '', u.created_at ?? new Date().toISOString(), providerName(u));
       else setUser(null);
@@ -89,7 +98,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = useCallback(async (name: string, email: string, pass: string): Promise<Res> => {
     if (!supabase) return { ok: false, message: 'الحسابات غير مهيّأة على هذه النسخة.' };
-    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password: pass });
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: pass,
+      /* الاسم يُحفظ مع الحساب حتى يُنشأ الملف بعد تأكيد البريد بنفس
+         الاسم الذي كتبه، لا باسم مأخوذ من البريد */
+      options: { emailRedirectTo: `${window.location.origin}/arena`, data: { name: name.trim() } },
+    });
     if (error) return { ok: false, message: arabize(error.message) };
 
     /* لو كان تأكيد البريد مفعّلاً فلا جلسة بعد، ويُكتب الملف عند أول دخول */
@@ -110,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     /* ضمان وجود الملف: بدونه لا يظهر اللاعب في لوحة الصدارة */
     if (data.user) {
-      const fallback = (data.user.email ?? '').split('@')[0];
+      const fallback = providerName(data.user) || (data.user.email ?? '').split('@')[0];
       const { data: prof } = await supabase.from('profiles').select('id').eq('id', data.user.id).maybeSingle();
       if (!prof) await supabase.from('profiles').upsert({ id: data.user.id, name: fallback });
       await hydrate(data.user.id, data.user.email ?? '', data.user.created_at);
@@ -136,17 +151,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { ok: true };
   }, []);
 
+  /* Supabase يرجّع نجاحاً سواء كان البريد مسجّلاً أو لا، فلا يكشف
+     الموقع لأحد أي البريدات عندها حسابات. */
+  const sendReset = useCallback(async (email: string): Promise<Res> => {
+    if (!supabase) return { ok: false, message: 'الحسابات غير مهيّأة على هذه النسخة.' };
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/account?mode=reset`,
+    });
+    if (error) return { ok: false, message: arabize(error.message) };
+    return { ok: true };
+  }, []);
+
+  const setNewPassword = useCallback(async (pass: string): Promise<Res> => {
+    if (!supabase) return { ok: false, message: 'الحسابات غير مهيّأة على هذه النسخة.' };
+    const { error } = await supabase.auth.updateUser({ password: pass });
+    if (error) return { ok: false, message: arabize(error.message) };
+    setRecovery(false);
+    return { ok: true };
+  }, []);
+
   const signOut = useCallback(() => {
     void supabase?.auth.signOut();
     setUser(null);
+    setRecovery(false);
   }, []);
 
   const value = useMemo<Ctx>(() => ({
-    user, ready, ask,
+    user, ready, recovery, ask,
     openAuth: m => setAsk(m),
     closeAuth: () => setAsk(null),
-    signUp, signIn, signInWithGoogle, signOut,
-  }), [user, ready, ask, signUp, signIn, signInWithGoogle, signOut]);
+    signUp, signIn, signInWithGoogle, sendReset, setNewPassword, signOut,
+  }), [user, ready, recovery, ask, signUp, signIn, signInWithGoogle, sendReset, setNewPassword, signOut]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
