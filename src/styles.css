@@ -680,3 +680,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-ink);outline-o
 .legal__cta{display:inline-block;margin-top:16px;background:linear-gradient(180deg,#F7C662,var(--gold));
   color:#3A2600;border-radius:12px;padding:13px 24px;font-family:var(--display);font-weight:800;font-size:15.5px}
 @media (max-width:760px){ .legal{padding-block:96px 56px} }
+
+/* ---------- انتظار تحميل صفحة ---------- */
+/* يحجز ارتفاع الشاشة حتى لا يقفز التذييل للأعلى لحظة التحميل،
+   وشريط ذهبي رفيع تحت الشريط العلوي يوضّح أن شيئاً يتحمّل. */
+.route-wait{min-height:100vh;position:relative}
+.route-wait::before{content:"";position:fixed;inset-inline:0;inset-block-start:64px;height:2px;z-index:60;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);background-size:40% 100%;
+  background-repeat:no-repeat;animation:routeWait 1s linear infinite}
+@keyframes routeWait{from{background-position:-40% 0}to{background-position:140% 0}}
+@media (prefers-reduced-motion:reduce){.route-wait::before{animation:none;background-size:100% 100%;opacity:.5}}
